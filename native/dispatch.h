@@ -15,6 +15,8 @@
 
 #define MSG_SIZE 1024
 
+#include <stdio.h>
+
 #include "ffi.h"
 #include "com_sun_jna_Function.h"
 #include "com_sun_jna_Native.h"

@@ -139,6 +139,21 @@ FFI_ENV=CPP="$(CPP)" CC="$(CC)" CFLAGS="$(COPT) $(CDEBUG) $(CINCLUDES)" CPPFLAGS
 FFI_CONFIG=--enable-static --disable-shared --with-pic=yes --host=$(HOST)
 endif
 
+#openwrt
+ifeq ($(ARCH),mips)
+PREFIX=mips-openwrt-linux-uclibc-
+COPT+= -msoft-float -fpic
+HOST=mips-openwrt-linux-uclibc
+CC=$(PREFIX)gcc
+CPP=$(PREFIX)cpp
+LD=$(PREFIX)gcc
+PHONEME=/home/wannes/phoneme-components-cdc/src
+JAVA_INCLUDES=-I$(PHONEME)/share/javavm/export -I$(PHONEME)/share -I$(PHONEME)/mips -I$(PHONEME)/linux-mips -I$(PHONEME)/linux -I$(PHONEME)
+CDEFINES=-DNO_JAWT
+FFI_CONFIG=--host=mips-openwrt-linux-uclibc
+STRIP=mips-openwrt-linux-strip -x
+endif
+
 # W32CE build requires cegcc cross-compiler and phoneME JavaME implementation
 # cegcc: http://sf.net/projects/cegcc
 # phoneme: http://davy.preuveneers.net/

@@ -87,6 +87,13 @@
   <condition property="test.compatibility" value="1.4">
     <equals arg1="${os.prefix}" arg2="w32ce-arm"/>
   </condition>
+  <!-- Set up restrictions for linux-mips, based on JavaME/CDC -->
+  <condition property="compatibility" value="1.4">
+    <equals arg1="${os.prefix}" arg2="linux-mips"/>
+  </condition>
+  <condition property="test.compatibility" value="1.4">
+    <equals arg1="${os.prefix}" arg2="linux-mips"/>
+  </condition>
   <!-- Default compatibility, 1.6, or whatever version is running -->
   <condition property="compatibility" value="${ant.java.version}" else="1.6">
     <matches pattern="^1.[345]$" string="${ant.java.version}"/>
@@ -100,7 +107,10 @@
     <equals arg1="${compatibility}" arg2="1.4"/>
   </condition>
   <condition property="tests.exclude-patterns" value="**/VarArgsTest.java,**/AnnotatedLibraryTest.java,**/WebStartTest.java,**/PointerBufferTest.java,**/HeadlessLoadLibraryTest.java,**/StructureBufferFieldTest.java,**/PerformanceTest.java,**/*BufferArgumentsMarshalTest.java" else="**/wince/*.java,**/WebStartTest.java">
-    <equals arg1="${os.prefix}" arg2="w32ce-arm"/>
+    <or>
+      <equals arg1="${os.prefix}" arg2="w32ce-arm"/>
+      <equals arg1="${os.prefix}" arg2="linux-mips"/>
+    </or>
   </condition>
   <property name="dist-jar" value="${dist}/${jar}"/>
 
@@ -396,6 +406,8 @@ processor=ppc;osname=aix,
 com/sun/jna/aix-ppc64/libjnidispatch.a;
 processor=ppc64;osname=aix,
 
+com/sun/jna/linux-mips/libjnidispatch.so;
+processor=mips;osname=linux,
 com/sun/jna/linux-ppc/libjnidispatch.so;
 processor=ppc;osname=linux,
 com/sun/jna/linux-ppc64/libjnidispatch.so;
@@ -453,6 +465,9 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
       <zipfileset src="${lib.native}/linux-aarch64.jar"
                   includes="*jnidispatch*"
                   prefix="com/sun/jna/linux-aarch64"/>
+     <zipfileset src="${lib.native}/linux-mips.jar"
+                  includes="*jnidispatch*"
+                  prefix="com/sun/jna/linux-mips"/>
       <zipfileset src="${lib.native}/linux-ia64.jar"
                   includes="*jnidispatch*"
                   prefix="com/sun/jna/linux-ia64"/>
@@ -617,6 +632,7 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
       <and>
         <not><os family="windows"/></not>
         <not><equals arg1="${os.prefix}" arg2="w32ce-arm"/></not>
+
       </and>
     </condition>
   </target>
@@ -669,8 +685,14 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
         <equals arg1="${os.prefix}" arg2="android-x86"/>
       </or>
     </condition>
+   <condition property="make.OS" value="OS=linux">
+      <equals arg1="${os.prefix}" arg2="linux-mips"/>
+    </condition>
     <property name="make.OS" value="IGNORE="/>
     <!-- Ensure Makefile ARCH property properly set -->
+    <condition property="ARCH" value="mips">
+      <equals arg1="${os.prefix}" arg2="linux-mips"/>
+    </condition>
     <condition property="ARCH" value="arm">
       <equals arg1="${os.prefix}" arg2="w32ce-arm"/>
     </condition>
@@ -766,7 +788,10 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
 
     <!-- Default make program -->
     <property name="make" value="make"/>
-
+	
+<echo>
+	calling ${make} in ${native}
+</echo>
     <exec executable="${make}" dir="${native}" failonerror="true">
       <arg value="JAVA_HOME=${jdk.home}"/>
       <arg value="JAVAH=${build.native}"/>
@@ -822,7 +847,7 @@ osname=macosx;processor=x86;processor=x86-64;processor=ppc
     </javac>
   </target>
 
-  <target name="compile-tests" depends="compile,native,jar"
+  <target name="compile-tests" depends="compile,native,jar" unless="cross-compile"
   	description="Compile all test code">
     <javac classpathref="compile-test.path"
            source="${test.compatibility}"
