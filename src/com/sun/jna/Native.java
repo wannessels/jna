@@ -675,7 +675,7 @@ public final class Native implements Version {
             while (dirs.hasMoreTokens()) {
                 String dir = dirs.nextToken();
 
-                File file = new File(new File(dir), replace(System.mapLibraryName(libName),".dylib", ".jnilib"));
+                File file = new File(new File(dir), replace(".dylib", ".jnilib",System.mapLibraryName(libName)));
                 String path = file.getAbsolutePath();
                 if (DEBUG_JNA_LOAD) {
                     System.out.println("Looking in " + path);
@@ -759,7 +759,7 @@ public final class Native implements Version {
      */
     private static void loadNativeDispatchLibraryFromClasspath() {
         try {
-            String libName = "/com/sun/jna/" + Platform.RESOURCE_PREFIX + "/" + replace(System.mapLibraryName("jnidispatch"),".dylib", ".jnilib");
+            String libName = "/com/sun/jna/" + Platform.RESOURCE_PREFIX + "/" + replace(".dylib", ".jnilib",System.mapLibraryName("jnidispatch"));
             File lib = extractFromResourcePath(libName, Native.class.getClassLoader());
             if (lib == null) {
                 if (lib == null) {
