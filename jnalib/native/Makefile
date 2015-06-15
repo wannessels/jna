@@ -84,6 +84,22 @@ endif
 STRIP=strip -x
 # end defaults
 
+#openwrt
+ifeq ($(ARCH),mips)
+PREFIX=mips-openwrt-linux-uclibc-
+COPT+= -msoft-float -fpic
+HOST=mips-openwrt-linux-uclibc
+CC=$(PREFIX)gcc
+CPP=$(PREFIX)cpp
+LD=$(PREFIX)gcc
+PHONEME=/home/wannes/phoneme-components-cdc/src
+JAVA_INCLUDES=-I$(PHONEME)/share/javavm/export -I$(PHONEME)/share -I$(PHONEME)/mips -I$(PHONEME)/linux-mips -I$(PHONEME)/linux -I$(PHONEME)
+CDEFINES=-DNO_JAWT
+FFI_CONFIG=--host=mips-openwrt-linux-uclibc
+STRIP=mips-openwrt-linux-strip -x
+endif
+
+
 ifeq ($(OS),win32)
 ARCH=$(shell uname -m | sed 's/i.86/i386/g')
 CDEFINES=-DHAVE_PROTECTION -DPSAPI_VERSION=1
