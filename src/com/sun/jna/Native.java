@@ -650,6 +650,7 @@ public final class Native implements Version {
         return buf;
     }
 
+
     /**
      * Loads the JNA stub library.
      * First tries jna.boot.library.path, then the system path, then from the
@@ -673,7 +674,8 @@ public final class Native implements Version {
             StringTokenizer dirs = new StringTokenizer(bootPath, File.pathSeparator);
             while (dirs.hasMoreTokens()) {
                 String dir = dirs.nextToken();
-                File file = new File(new File(dir), System.mapLibraryName(libName).replace(".dylib", ".jnilib"));
+
+                File file = new File(new File(dir), replace(System.mapLibraryName(libName),".dylib", ".jnilib"));
                 String path = file.getAbsolutePath();
                 if (DEBUG_JNA_LOAD) {
                     System.out.println("Looking in " + path);
@@ -757,7 +759,7 @@ public final class Native implements Version {
      */
     private static void loadNativeDispatchLibraryFromClasspath() {
         try {
-            String libName = "/com/sun/jna/" + Platform.RESOURCE_PREFIX + "/" + System.mapLibraryName("jnidispatch").replace(".dylib", ".jnilib");
+            String libName = "/com/sun/jna/" + Platform.RESOURCE_PREFIX + "/" + replace(System.mapLibraryName("jnidispatch"),".dylib", ".jnilib");
             File lib = extractFromResourcePath(libName, Native.class.getClassLoader());
             if (lib == null) {
                 if (lib == null) {
@@ -1281,7 +1283,7 @@ public final class Native implements Version {
 
     // No String.replace available in 1.4
     static String replace(String s1, String s2, String str) {
-        StringBuilder buf = new StringBuilder();
+        StringBuffer buf = new StringBuffer();
         while (true) {
             int idx = str.indexOf(s1);
             if (idx == -1) {
