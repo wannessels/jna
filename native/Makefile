@@ -149,7 +149,7 @@ CPP=$(PREFIX)cpp
 LD=$(PREFIX)gcc
 PHONEME=/home/wannes/phoneme-components-cdc/src
 JAVA_INCLUDES=-I$(PHONEME)/share/javavm/export -I$(PHONEME)/share -I$(PHONEME)/mips -I$(PHONEME)/linux-mips -I$(PHONEME)/linux -I$(PHONEME)
-CDEFINES=-DNO_JAWT -DNO_NIO_BUFFERS
+CDEFINES=-DNO_JAWT -DNO_NIO_BUFFERS -DNO_WEAK_GLOBALS -DFFI_MMAP_EXEC_WRIT=1 -DFFI_MMAP_EXEC_SELINUX=0
 FFI_CONFIG=--host=mips-openwrt-linux-uclibc
 STRIP=mips-openwrt-linux-strip -x
 endif

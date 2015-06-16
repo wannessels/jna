@@ -699,9 +699,9 @@ JNA_callback_init(JNIEnv* env) {
   static pthread_once_t key_once = PTHREAD_ONCE_INIT;
   pthread_once(&key_once, make_thread_data_key);
 #endif
+ if (!LOAD_CREF(env, Object, "java/lang/Object")) return "java.lang.Object";
 
-  if (!LOAD_CREF(env, Object, "java/lang/Object")) return "java.lang.Object";
-
+fprintf(stderr, "JNA: callback_init returning null\n");
   return NULL;
 }
   

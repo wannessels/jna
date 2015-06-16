@@ -93,7 +93,8 @@ static int _protect;
 #define PROTECT _protect
 #endif
 
-#define CHARSET_UTF8 "utf8"
+//#define CHARSET_UTF8 "utf8"
+#define CHARSET_UTF8 "utf-8"
 
 #ifdef __cplusplus
 extern "C" {
@@ -1309,6 +1310,8 @@ get_system_property(JNIEnv* env, const char* name) {
 
 static const char*
 JNA_init(JNIEnv* env) {
+
+
   if (!LOAD_CREF(env, Object, "java/lang/Object")) return "java.lang.Object";
   if (!LOAD_CREF(env, Class, "java/lang/Class")) return "java.lang.Class";
   if (!LOAD_CREF(env, Method, "java/lang/reflect/Method")) return "java.lang.reflect.Method";
@@ -1386,6 +1389,12 @@ JNA_init(JNIEnv* env) {
                 "getReturnType", "()Ljava/lang/Class;"))
     return "Method.getReturnType()";
 
+if (!FIND_CLASS(env, Object, "java/lang/Object"))
+	fprintf(stderr, "JNA: jna_init find_class Object failed\n");
+if (!LOAD_WEAKREF(env,classObject))
+	fprintf(stderr, "JNA: callback_init load_weakref Object failed\n");
+
+
 #ifndef NO_NIO_BUFFERS
   if (!LOAD_MID(env, MID_Buffer_position, classBuffer, "position", "()I"))
     return "Buffer.position";
@@ -1419,6 +1428,7 @@ JNA_init(JNIEnv* env) {
     return "DoubleBuffer.arrayOffset";
 #endif
 
+
   if (!LOAD_FID(env, FID_Boolean_value, classBoolean, "value", "Z"))
     return "Boolean.value";
   if (!LOAD_FID(env, FID_Byte_value, classByte, "value", "B"))
@@ -1436,10 +1446,27 @@ JNA_init(JNIEnv* env) {
   if (!LOAD_FID(env, FID_Double_value, classDouble, "value", "D"))
     return "Double.value";
 
-  fileEncoding = get_system_property(env, "file.encoding");
-  if (fileEncoding) {
-    fileEncoding = (*env)->NewGlobalRef(env, fileEncoding);
-  }
+
+
+
+ // fileEncoding = get_system_property(env, "file.encoding");
+
+if (!FIND_CLASS(env, Object, "java/lang/Object"))
+	fprintf(stderr, "JNA: jna_init find_class Object failed2\n");
+if (!LOAD_WEAKREF(env,classObject))
+	fprintf(stderr, "JNA: callback_init load_weakref Object failed2\n");
+
+//  if (fileEncoding) {
+//	fprintf(stderr, "JNA: fileencoding set\n");
+
+//    fileEncoding = (*env)->NewGlobalRef(env, fileEncoding);
+//  }
+
+if (!FIND_CLASS(env, Object, "java/lang/Object"))
+	fprintf(stderr, "JNA: jna_init find_class Object failed3\n");
+if (!LOAD_WEAKREF(env,classObject))
+	fprintf(stderr, "JNA: callback_init load_weakref Object failed3\n");
+
 
   return NULL;
 }
@@ -3096,20 +3123,33 @@ JNI_OnLoad(JavaVM *jvm, void *UNUSED(reserved)) {
     }
   }
 
+
   if ((err = JNA_init(env)) != NULL) {
     fprintf(stderr, "JNA: Problems loading core IDs: %s\n", err);
     result = 0;
   }
-  else if ((err = JNA_callback_init(env)) != NULL) {
-    fprintf(stderr, "JNA: Problems loading callback IDs: %s\n", err);
-    result = 0;
-  }
+  else {
+
+jclass objectClass = (*env)->FindClass(env,"java/lang/Object");
+if (objectClass == NULL)
+ fprintf(stderr,"findclass null");
+if (objectClass != NULL)
+	 fprintf(stderr,"findclass not null");
+
+
+	if ((err = JNA_callback_init(env)) != NULL) {
+	    fprintf(stderr, "JNA: Problems loading callback IDs: %s\n", err);
+	    result = 0;
+	  }
+	}
+
+fprintf(stderr, "JNA: after callback_init\n");
   if (!attached) {
     if ((*jvm)->DetachCurrentThread(jvm) != 0) {
       fprintf(stderr, "JNA: could not detach thread on initial load\n");
     }
   }
-
+fprintf(stderr, "JNA: before return\n");
   return result;
 }
 
